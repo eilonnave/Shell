@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import sys
+import getpass
 EMPTY_STRING = ''
-WRONG_PARAMS_1 = 'The function should receive 1 param '
+WRONG_PARAMS_1 = 'The function should receive 0 param '
 WRONG_PARAMS_2 = ' is given'
 
 
@@ -14,7 +15,7 @@ def valid(params_list):
     and if not a matching error message
     """
     length = len(params_list)
-    if length != 1:
+    if length != 0:
         return False, WRONG_PARAMS_1+str(
             length)+WRONG_PARAMS_2
     return True, EMPTY_STRING
@@ -28,11 +29,11 @@ def execute_function(params_list):
     params
     :return: matching output
     """
-    name = params_list[0]
+    name = getpass.getuser()
     return 'hello '+name
 
 
-def input_params():
+def get_params():
     """
     the function gets the input params
     from the user
@@ -45,7 +46,7 @@ def main():
     """
     main function
     """
-    params_list = input_params()
+    params_list = get_params()
     is_valid, mess = valid(params_list)
     if is_valid:
         print execute_function(params_list)
@@ -55,7 +56,5 @@ def main():
 
 if __name__ == '__main__':
     assert not valid(['null', 'null'])[0]
-    assert valid(['null'])[0]
-    assert execute_function(
-        ['null']).find('null') != -1
+    assert valid([])[0]
     main()
