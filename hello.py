@@ -2,7 +2,7 @@
 import sys
 import getpass
 EMPTY_STRING = ''
-WRONG_PARAMS_1 = 'The function should receive 0 param '
+WRONG_PARAMS_1 = 'The function hello should receive 0 param '
 WRONG_PARAMS_2 = ' is given'
 
 
@@ -21,13 +21,10 @@ def valid(params_list):
     return True, EMPTY_STRING
 
 
-def execute_function(params_list):
+def execute_function():
     """
-    the function return matching input for the user
-    according to the receiving params
-    :param params_list: the list of the input
-    params
-    :return: matching output
+    the function return hello + the user name
+    :return: hello + the user name
     """
     name = getpass.getuser()
     return 'hello '+name
@@ -49,7 +46,7 @@ def main():
     params_list = get_params()
     is_valid, mess = valid(params_list)
     if is_valid:
-        print execute_function(params_list)
+        print execute_function()
     else:
         print mess
 

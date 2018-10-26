@@ -2,11 +2,11 @@
 import sys
 import os
 EMPTY_STRING = ''
-WRONG_PARAMS_1 = 'The function hexdump should receive 1 param '
+WRONG_PARAMS_1 = 'The function grep should receive 1 param '
 WRONG_PARAMS_2 = ' is given'
 FILE_IS_NOT_EXCISE = 'Can not locate the given file- '
 SPACE = ' '
-VALUE_ERROR_MESS = 'Invalid data from the file or the buffer'
+NEXT_LINE = '\n'
 
 
 def get_params():
@@ -27,30 +27,20 @@ def valid(params_list):
     :return: whether the params are valid or not
     and if not a matching error message
     """
-    global insert_stdin
     length = len(params_list)
-    if length == 1:
+    if length == 2:
         file_path = params_list[0]
         if os.path.isfile(file_path):
             return True, EMPTY_STRING
         else:
             return False, FILE_IS_NOT_EXCISE+file_path
-    elif length == 0:
+    elif length == 1:
+        global insert_stdin
         insert_stdin = sys.stdin.read()
         if insert_stdin is not EMPTY_STRING:
-            return True, EMPTY_STRING
+            return True, None
     return False, WRONG_PARAMS_1+str(
         length)+WRONG_PARAMS_2
-
-
-def convert_to_hex(binary_data):
-    """
-    the function convert the string of the
-    binary number to hex string
-    :b_numbers: the string of the binary number
-    :return: the hex number
-    """
-    return hex(int(binary_data, 2))
 
 
 def execute_function(params_list):
@@ -61,14 +51,19 @@ def execute_function(params_list):
     params
     :return: matching output
     """
-    if len(params_list) == 0:
-        binary_data = insert_stdin
+    if len(params_list) == 1:
+        file_data = insert_stdin
+        find_string = params_list[0]
     else:
-        file_path = params_list[0]
-        with open(file_path, 'rb') as file_handle:
-            binary_data = file_handle.read()
-    hex_data = convert_to_hex(binary_data)
-    return hex_data
+        with open(params_list[0], 'r') as file_handle:
+            file_data = file_handle.read()
+        find_string = params_list[1]
+    return_string = ''
+    file_data = file_data.split(NEXT_LINE)
+    for line in file_data:
+        if line.find(find_string) != -1:
+            return_string += line+NEXT_LINE
+    return return_string
 
 
 def main():
@@ -84,14 +79,20 @@ def main():
 
 
 if __name__ == '__main__':
-    with open('assert bin.txt', 'w') as assert_file_handle:
-        assert_file_handle.write('11110000')
-    assert_params_list = ['assert bin.txt']
+    with open('hello world.txt', 'w') as assert_file_handle:
+        assert_file_handle.write('hello world\nI am eilon')
+    assert_params_list = ['hello world.txt', 'hello']
     assert valid(assert_params_list)[0]
     assert execute_function(
-        assert_params_list).find('f0') != -1
+        assert_params_list) == 'hello world\n'
+    assert_params_list = ['hello world.txt', 'am']
     assert execute_function(
-        assert_params_list).find('ff') == -1
-    os.remove('assert bin.txt')
+        assert_params_list) == 'I am eilon\n'
+    assert not execute_function(
+        assert_params_list) == 'hello world\n'
+    assert_params_list = ['hello world.txt', 'e']
+    assert execute_function(
+        assert_params_list) == 'hello world\nI am eilon\n'
+    os.remove('hello world.txt')
     assert not valid(assert_params_list)[0]
     main()
